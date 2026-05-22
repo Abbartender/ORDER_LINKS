@@ -652,8 +652,7 @@
         // Configuración de Supabase
         const SUPABASE_URL = 'https://uilvmygifujudgvaezdt.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpbHZteWdpZnVqdWRndmFlemR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTYxMzcsImV4cCI6MjA5MTg3MjEzN30.QwsPvXbvLfmnsf5Hb8MPuXonO3WD7QZa15ntf_DPM3s';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let links = [];
         let filteredLinks = [];
 
@@ -672,7 +671,7 @@
 
         async function ensureTableExists() {
             // Intentar obtener datos - si falla, la tabla no existe
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('links')
                 .select('id')
                 .limit(1);
@@ -703,7 +702,7 @@ CREATE POLICY "Allow all operations" ON links FOR ALL USING (true);
 
         async function loadLinksFromSupabase() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('links')
                     .select('*')
                     .order('timestamp', { ascending: false });
@@ -833,7 +832,7 @@ CREATE POLICY "Allow all operations" ON links FOR ALL USING (true);
             };
             
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('links')
                     .insert([link]);
                 
@@ -865,7 +864,7 @@ CREATE POLICY "Allow all operations" ON links FOR ALL USING (true);
             if (!confirm('¿Estás seguro de eliminar este link?')) return;
             
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('links')
                     .delete()
                     .eq('id', id);
@@ -955,7 +954,7 @@ CREATE POLICY "Allow all operations" ON links FOR ALL USING (true);
                 updateSyncStatus('Importando...', '🔄', true);
                 
                 // Insertar links en Supabase
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('links')
                     .insert(importedLinks);
                 
