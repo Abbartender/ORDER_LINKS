@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Organizer - Gestiona tus proyectos</title>
+    <meta name="description" content="Organiza y gestiona los links de tus proyectos, landings y aplicaciones">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --bg-primary: #0a0e12;
+            --bg-secondary: #12171d;
+            --bg-card: #1a2028;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --text-muted: #5f6368;
+            --accent: #4fc3f7;
+            --accent-hover: #29b6f6;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #81c784;
+            --danger: #e57373;
+            --warning: #ffb74d;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding: 32px 0;
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, #29b6f6 50%, #81c784 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+        
+        .sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--success);
+            margin-top: 12px;
+        }
+        
+        .search-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow);
+        }
+        
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 20px;
+            pointer-events: none;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 16px 20px 16px 56px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
+        }
+        
+        #searchInput::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .search-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-stats {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .utility-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-utility {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+        }
+        
+        .btn-utility:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .add-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input[type="text"],
+        input[type="url"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="file"] {
+            padding: 12px 18px;
+            cursor: pointer;
+        }
+        
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.1);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: var(--bg-primary);
+            width: 100%;
+            box-shadow: 0 4px 16px rgba(79, 195, 247, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(79, 195, 247, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-danger {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .btn-danger:hover {
+            background: rgba(229, 115, 115, 0.1);
+        }
+        
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        
+        .link-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .link-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .link-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        
+        .link-card:hover::before {
+            opacity: 1;
+        }
+        
+        .link-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .link-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+        
+        .link-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        
+        .link-url {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+            display: inline-block;
+            margin-bottom: 12px;
+            word-break: break-all;
+            transition: color 0.3s ease;
+        }
+        
+        .link-url:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+        
+        .link-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .link-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .link-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            opacity: 0.3;
+            margin-bottom: 16px;
+        }
+        
+        .empty-text {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--accent);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .link-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .add-section {
+                padding: 20px;
+            }
+            
+            .utility-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .btn-utility {
+                width: 100%;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .link-card {
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 Link Organizer</h1>
+            <p class="subtitle">Gestiona los links de tus proyectos y aplicaciones</p>
+            <div class="sync-badge" id="syncBadge">
+                <span id="syncIcon">🔄</span>
+                <span id="syncText">Conectando...</span>
+            </div>
+        </header>
+
+        <div class="search-section">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Buscar por título, URL o descripción..."
+                    autocomplete="off"
+                >
+            </div>
+            <div class="search-actions">
+                <div class="search-stats" id="searchStats"></div>
+                <div class="utility-buttons">
+                    <button class="btn-utility" onclick="openImportModal()">
+                        📥 Importar
+                    </button>
+                    <button class="btn-utility" onclick="exportLinks()">
+                        💾 Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value" id="totalLinks">0</div>
+                <div class="stat-label">Total de Links</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="filteredLinks">0</div>
+                <div class="stat-label">Resultados</div>
+            </div>
+        </div>
+
+        <div class="add-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Título del proyecto</label>
+                    <input 
+                        type="text" 
+                        id="titleInput" 
+                        placeholder="Ej: Mi Landing Page"
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL</label>
+                    <input 
+                        type="url" 
+                        id="urlInput" 
+                        placeholder="https://miproyecto.com"
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción breve</label>
+                    <textarea 
+                        id="descInput" 
+                        placeholder="Una descripción corta de tu proyecto..."
+                    ></textarea>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="addLink()" id="addButton">
+                ➕ Agregar Link
+            </button>
+        </div>
+
+        <div id="linksList">
+            <div class="loading">
+                <span class="spinning">🔄</span> Cargando links...
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de importación -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <h2 class="modal-title">📥 Importar Links</h2>
+            <p class="modal-text">
+                Selecciona el archivo JSON que exportaste anteriormente. Esto agregará todos los links a tu colección actual.
+            </p>
+            <div class="form-group" style="margin-bottom: 24px;">
+                <input 
+                    type="file" 
+                    id="importFile" 
+                    accept=".json"
+                >
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeImportModal()">
+                    Cancelar
+                </button>
+                <button class="btn btn-primary" onclick="importLinks()" style="flex: 1;">
+                    Importar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://uilvmygifujudgvaezdt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVpbHZteWdpZnVqdWRndmFlemR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTYxMzcsImV4cCI6MjA5MTg3MjEzN30.QwsPvXbvLfmnsf5Hb8MPuXonO3WD7QZa15ntf_DPM3s';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let links = [];
+        let filteredLinks = [];
+
+        // Inicializar la aplicación
+        async function initApp() {
+            updateSyncStatus('Conectando...', '🔄', true);
+            
+            // Verificar si la tabla existe, si no, crearla
+            await ensureTableExists();
+            
+            // Cargar links de Supabase
+            await loadLinksFromSupabase();
+            
+            updateSyncStatus('Sincronizado', '✅', false);
+        }
+
+        async function ensureTableExists() {
+            // Intentar obtener datos - si falla, la tabla no existe
+            const { error } = await supabase
+                .from('links')
+                .select('id')
+                .limit(1);
+            
+            if (error && error.code === '42P01') {
+                // Tabla no existe - instrucciones para crearla
+                console.log('La tabla no existe. Créala ejecutando este SQL en Supabase:');
+                console.log(`
+CREATE TABLE links (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    url TEXT NOT NULL,
+    description TEXT,
+    timestamp BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Habilitar Row Level Security
+ALTER TABLE links ENABLE ROW LEVEL SECURITY;
+
+-- Política para permitir todas las operaciones (solo para desarrollo/uso personal)
+CREATE POLICY "Allow all operations" ON links FOR ALL USING (true);
+                `);
+                
+                alert('⚠️ Necesitas crear la tabla en Supabase.\n\n1. Ve a tu proyecto en Supabase\n2. Click en "SQL Editor"\n3. Pega el SQL que está en la consola del navegador\n4. Click en "Run"\n5. Recarga esta página');
+            }
+        }
+
+        async function loadLinksFromSupabase() {
+            try {
+                const { data, error } = await supabase
+                    .from('links')
+                    .select('*')
+                    .order('timestamp', { ascending: false });
+                
+                if (error) throw error;
+                
+                links = data || [];
+                filteredLinks = [...links];
+                updateStats();
+                renderLinks();
+            } catch (error) {
+                console.error('Error loading links:', error);
+                updateSyncStatus('Error de conexión', '❌', false);
+            }
+        }
+
+        function updateSyncStatus(text, icon, spinning) {
+            document.getElementById('syncText').textContent = text;
+            document.getElementById('syncIcon').textContent = icon;
+            const iconEl = document.getElementById('syncIcon');
+            if (spinning) {
+                iconEl.classList.add('spinning');
+            } else {
+                iconEl.classList.remove('spinning');
+            }
+        }
+
+        function updateStats() {
+            const statsSection = document.getElementById('stats');
+            const totalLinksEl = document.getElementById('totalLinks');
+            const filteredLinksEl = document.getElementById('filteredLinks');
+            
+            if (links.length > 0) {
+                statsSection.style.display = 'grid';
+                totalLinksEl.textContent = links.length;
+                filteredLinksEl.textContent = filteredLinks.length;
+            } else {
+                statsSection.style.display = 'none';
+            }
+        }
+
+        function renderLinks() {
+            const container = document.getElementById('linksList');
+            
+            if (filteredLinks.length === 0) {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                if (searchTerm && links.length > 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <div class="empty-text">
+                                No se encontraron resultados para "${escapeHtml(searchTerm)}"
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-text">
+                                Aún no hay links guardados<br>
+                                Agrega tu primer proyecto arriba
+                            </div>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            container.innerHTML = '<div class="link-grid">' + filteredLinks.map(link => {
+                const icon = link.title.substring(0, 2).toUpperCase();
+                const date = new Date(link.timestamp).toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                
+                return `
+                    <div class="link-card">
+                        <div class="link-header">
+                            <div class="link-icon">${icon}</div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div class="link-title">${escapeHtml(link.title)}</div>
+                            </div>
+                        </div>
+                        <a href="${escapeHtml(link.url)}" class="link-url" target="_blank" rel="noopener noreferrer">
+                            ${escapeHtml(link.url)}
+                        </a>
+                        <div class="link-desc">${escapeHtml(link.description || 'Sin descripción')}</div>
+                        <div class="link-footer">
+                            <span class="link-date">📅 ${date}</span>
+                            <button class="btn btn-danger" onclick="deleteLink('${link.id}')">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('') + '</div>';
+        }
+
+        async function addLink() {
+            const title = document.getElementById('titleInput').value.trim();
+            const url = document.getElementById('urlInput').value.trim();
+            const description = document.getElementById('descInput').value.trim();
+            
+            if (!title || !url) {
+                alert('⚠️ Por favor completa al menos el título y la URL');
+                return;
+            }
+
+            if (!isValidUrl(url)) {
+                alert('⚠️ Por favor ingresa una URL válida (debe comenzar con http:// o https://)');
+                return;
+            }
+            
+            const addButton = document.getElementById('addButton');
+            addButton.disabled = true;
+            addButton.textContent = 'Guardando...';
+            
+            const id = Date.now().toString();
+            const link = {
+                id,
+                title,
+                url,
+                description,
+                timestamp: Date.now()
+            };
+            
+            try {
+                const { error } = await supabase
+                    .from('links')
+                    .insert([link]);
+                
+                if (error) throw error;
+                
+                links.unshift(link);
+                
+                document.getElementById('titleInput').value = '';
+                document.getElementById('urlInput').value = '';
+                document.getElementById('descInput').value = '';
+                
+                filterLinks();
+                updateStats();
+                renderLinks();
+                
+                document.getElementById('titleInput').focus();
+                updateSyncStatus('Sincronizado', '✅', false);
+            } catch (error) {
+                console.error('Error adding link:', error);
+                alert('❌ Error al guardar el link. Revisa la consola.');
+                updateSyncStatus('Error al guardar', '❌', false);
+            } finally {
+                addButton.disabled = false;
+                addButton.textContent = '➕ Agregar Link';
+            }
+        }
+
+        async function deleteLink(id) {
+            if (!confirm('¿Estás seguro de eliminar este link?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('links')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                links = links.filter(l => l.id !== id);
+                filterLinks();
+                updateStats();
+                renderLinks();
+                updateSyncStatus('Sincronizado', '✅', false);
+            } catch (error) {
+                console.error('Error deleting link:', error);
+                alert('❌ Error al eliminar el link');
+                updateSyncStatus('Error', '❌', false);
+            }
+        }
+
+        function filterLinks() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredLinks = [...links];
+                document.getElementById('searchStats').textContent = '';
+            } else {
+                filteredLinks = links.filter(link => {
+                    return link.title.toLowerCase().includes(searchTerm) ||
+                           link.url.toLowerCase().includes(searchTerm) ||
+                           (link.description && link.description.toLowerCase().includes(searchTerm));
+                });
+                
+                const statsText = filteredLinks.length === 1 
+                    ? '1 resultado encontrado' 
+                    : `${filteredLinks.length} resultados encontrados`;
+                document.getElementById('searchStats').textContent = statsText;
+            }
+            
+            updateStats();
+        }
+
+        function exportLinks() {
+            if (links.length === 0) {
+                alert('⚠️ No hay links para exportar');
+                return;
+            }
+            
+            const data = JSON.stringify(links, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mis-links-' + new Date().toISOString().split('T')[0] + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Links exportados correctamente!');
+        }
+
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+            document.getElementById('importFile').value = '';
+        }
+
+        async function importLinks() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('⚠️ Por favor selecciona un archivo');
+                return;
+            }
+            
+            try {
+                const text = await file.text();
+                const importedLinks = JSON.parse(text);
+                
+                if (!Array.isArray(importedLinks)) {
+                    throw new Error('Formato de archivo inválido');
+                }
+                
+                updateSyncStatus('Importando...', '🔄', true);
+                
+                // Insertar links en Supabase
+                const { error } = await supabase
+                    .from('links')
+                    .insert(importedLinks);
+                
+                if (error) throw error;
+                
+                // Recargar desde Supabase
+                await loadLinksFromSupabase();
+                
+                closeImportModal();
+                alert(`✅ ${importedLinks.length} links importados correctamente!`);
+                updateSyncStatus('Sincronizado', '✅', false);
+            } catch (error) {
+                console.error('Error importing links:', error);
+                alert('❌ Error al importar: ' + error.message);
+                updateSyncStatus('Error', '❌', false);
+            }
+        }
+
+        function isValidUrl(string) {
+            try {
+                const url = new URL(string);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('searchInput').addEventListener('input', () => {
+            filterLinks();
+            renderLinks();
+        });
+
+        document.getElementById('titleInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('urlInput').focus();
+            }
+        });
+
+        document.getElementById('urlInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('descInput').focus();
+            }
+        });
+
+        document.getElementById('descInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                addLink();
+            }
+        });
+
+        // Cerrar modal al hacer click fuera
+        document.getElementById('importModal').addEventListener('click', (e) => {
+            if (e.target.id === 'importModal') {
+                closeImportModal();
+            }
+        });
+
+        // Iniciar la app
+        initApp();
+    </script>
+</body>
+</html>
